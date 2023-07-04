@@ -1,9 +1,12 @@
 import numpy as np
+from keras.callbacks import History
 from keras.datasets import cifar10
 from matplotlib import pyplot as plt
+import pandas as pd
 
 LABELS_MAPPING = {0: "avion", 1: "automobile", 2: "oiseau", 3: "chat", 4: "cerf",
                   5: "chien", 6: "crapaud", 7: "cheval", 8: "bateau", 9: "camion"}
+
 
 def generate_cifar10_dataset(labeled_data_proportion: float):
     """
@@ -33,6 +36,7 @@ def generate_cifar10_dataset(labeled_data_proportion: float):
 
     return x_train_lab_res, y_train_lab_res, x_train_unlab_res, y_train_unlab_res, x_test_, y_test_
 
+
 def to_labels(y_pred):
     """
     Convertit les probabilités prédites en classes.
@@ -45,7 +49,6 @@ def to_labels(y_pred):
 
 
 def plot_metrics(train_losses, train_accuracies, test_losses, test_accuracies, suptitle=""):
-
     fig, axs = plt.subplots(2, 1, sharex='col', sharey='row')
 
     # Loss
@@ -53,7 +56,8 @@ def plot_metrics(train_losses, train_accuracies, test_losses, test_accuracies, s
     axs[0].plot(test_losses, label='Loss on test set')
     min_val_loss_epoch = np.argmin(test_losses)
     min_val_loss = min(test_losses)
-    axs[0].set_title(f'Evolution of train and test losses over epochs (best test loss = {round(min_val_loss,2)} at epoch {min_val_loss_epoch})')
+    axs[0].set_title(
+        f'Evolution of train and test losses over epochs (best test loss = {round(min_val_loss, 2)} at epoch {min_val_loss_epoch})')
     axs[0].set_xlabel('Epochs')
     axs[0].set_ylabel('Loss')
     axs[0].legend()
@@ -65,7 +69,8 @@ def plot_metrics(train_losses, train_accuracies, test_losses, test_accuracies, s
     max_val_acc = max(test_accuracies)
     axs[1].set_xlabel('Epochs')
     axs[1].set_ylabel('Accuracy')
-    axs[1].set_title(f'Evolution of train and test accuracies over epochs (best test accuracy = {round(max_val_acc, 2)} at epoch {max_val_acc_epoch})')
+    axs[1].set_title(
+        f'Evolution of train and test accuracies over epochs (best test accuracy = {round(max_val_acc, 2)} at epoch {max_val_acc_epoch})')
     axs[1].legend()
 
     plt.suptitle(suptitle)
@@ -74,23 +79,33 @@ def plot_metrics(train_losses, train_accuracies, test_losses, test_accuracies, s
 
 
 def plot_confusion_matrix(y_train_true, y_train_pred, y_test_true, y_test_pred):
-  from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+    from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
-  fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 
-  # train data
-  cm_train = confusion_matrix(y_train_true, to_labels(y_train_pred))
-  disp = ConfusionMatrixDisplay(confusion_matrix=cm_train, display_labels=LABELS_MAPPING.values())
-  disp.plot(cmap='viridis', ax=axs[0], colorbar=False)
-  axs[0].set_title(f'Confusion matrix on train data')
-  plt.setp(disp.ax_.xaxis.get_majorticklabels(), rotation=90)
+    # train data
+    cm_train = confusion_matrix(y_train_true, to_labels(y_train_pred))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm_train, display_labels=LABELS_MAPPING.values())
+    disp.plot(cmap='viridis', ax=axs[0], colorbar=False)
+    axs[0].set_title(f'Confusion matrix on train data')
+    plt.setp(disp.ax_.xaxis.get_majorticklabels(), rotation=90)
 
-  # test data
-  cm_test = confusion_matrix(y_test_true, to_labels(y_test_pred))
-  disp = ConfusionMatrixDisplay(confusion_matrix=cm_test, display_labels=LABELS_MAPPING.values())
-  disp.plot(cmap='viridis', ax=axs[1], colorbar=False)
-  axs[1].set_title('Confusion matrix on test data')
-  plt.setp(disp.ax_.xaxis.get_majorticklabels(), rotation=90)
+    # test data
+    cm_test = confusion_matrix(y_test_true, to_labels(y_test_pred))
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm_test, display_labels=LABELS_MAPPING.values())
+    disp.plot(cmap='viridis', ax=axs[1], colorbar=False)
+    axs[1].set_title('Confusion matrix on test data')
+    plt.setp(disp.ax_.xaxis.get_majorticklabels(), rotation=90)
 
-  plt.tight_layout()
-  plt.show()
+    plt.tight_layout()
+    plt.show()
+
+
+def history_dict_to_dataframe(history_dict):
+    df = pd.DataFrame(history_dict)
+    df.reset_index(drop=False, inplace=True)
+    df.rename(columns={"index": "epoch", "sparse_categorical_accuracy": "train_acc",
+                       "val_loss": "test_loss", "val_sparse_categorical_accuracy": "test_acc"},
+              inplace=True)
+    df = df[['epoch', 'loss', 'test_loss', 'train_acc', 'test_acc']]
+    return df
