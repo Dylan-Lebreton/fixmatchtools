@@ -1,8 +1,9 @@
 import numpy as np
+import pandas as pd
 from keras.callbacks import History
 from keras.datasets import cifar10
 from matplotlib import pyplot as plt
-import pandas as pd
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 LABELS_MAPPING = {0: "avion", 1: "automobile", 2: "oiseau", 3: "chat", 4: "cerf",
                   5: "chien", 6: "crapaud", 7: "cheval", 8: "bateau", 9: "camion"}
@@ -78,9 +79,7 @@ def plot_metrics(train_losses, train_accuracies, test_losses, test_accuracies, s
     plt.show()
 
 
-def plot_confusion_matrix(y_train_true, y_train_pred, y_test_true, y_test_pred):
-    from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-
+def plot_confusion_matrix(y_train_true, y_train_pred, y_test_true, y_test_pred, suptitle=""):
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 
     # train data
@@ -97,6 +96,7 @@ def plot_confusion_matrix(y_train_true, y_train_pred, y_test_true, y_test_pred):
     axs[1].set_title('Confusion matrix on test data')
     plt.setp(disp.ax_.xaxis.get_majorticklabels(), rotation=90)
 
+    plt.suptitle(suptitle)
     plt.tight_layout()
     plt.show()
 
