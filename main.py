@@ -104,8 +104,9 @@ def plot_confusion_matrix(y_train_true, y_train_pred, y_test_true, y_test_pred):
 def history_to_dataframe(history: History):
     df = pd.DataFrame(history.history)
     df.reset_index(drop=False, inplace=True)
-    df.rename(columns={"index": "epoch", "sparse_categorical_accuracy": "train_acc",
+    df.rename(columns={"index": "epoch", "loss": "train_loss",
+                       "sparse_categorical_accuracy": "train_acc",
                        "val_loss": "test_loss", "val_sparse_categorical_accuracy": "test_acc"},
               inplace=True)
-    df = df[['epoch', 'loss', 'test_loss', 'train_acc', 'test_acc']]
+    df = df[['epoch', 'train_loss', 'test_loss', 'train_acc', 'test_acc']]
     return df
