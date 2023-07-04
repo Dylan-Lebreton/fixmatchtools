@@ -101,7 +101,7 @@ def plot_confusion_matrix(y_train_true, y_train_pred, y_test_true, y_test_pred):
     plt.show()
 
 
-def history_dict_to_dataframe(history_dict):
+def history_to_dataframe(history_dict):
     df = pd.DataFrame(history_dict)
     df.reset_index(drop=False, inplace=True)
     df.rename(columns={"index": "epoch", "sparse_categorical_accuracy": "train_acc",
